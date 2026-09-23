@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="gu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VS Film બિલબુક</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{--bg:#f4f4f7;--c:#fff;--t:#16161d;--m:#6b6b78;--a:#16161d;--b:#dcdce4;--g:#1a7f4b;--r:#c0392b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:'Noto Sans Gujarati','Inter',sans-serif;font-size:15px}
+header{background:var(--a);color:#fff;padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:0;z-index:5}
+header b{font-size:17px;margin-right:12px}#nav{display:flex;gap:6px;flex-wrap:wrap}
+#nav button{background:#33333f;color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;font:inherit}#nav .on{background:#fff;color:#000}
+main{max-width:1000px;margin:auto;padding:16px}h2{margin:4px 0 14px}h3{margin:18px 0 8px}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:14px;margin-bottom:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.k{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:12px}.k small{color:var(--m)}.k div{font-size:22px;font-weight:700;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label{display:flex;flex-direction:column;font-size:13px;color:var(--m);gap:4px}
+input,textarea,select{font:inherit;padding:9px;border:1px solid var(--b);border-radius:8px;background:#fff;color:var(--t);width:100%}
+button{font:inherit;cursor:pointer;border:1px solid var(--b);background:#fff;border-radius:8px;padding:8px 12px}
+.p{background:var(--a);color:#fff;border-color:var(--a)}.wa{background:#25d366;border-color:#25d366;color:#fff}.x{color:var(--r)}
+.row{display:grid;grid-template-columns:150px 1fr 1.3fr 40px;gap:8px;margin-bottom:8px;align-items:start}
+.row.pay{grid-template-columns:150px 1fr 1fr 40px}
+@media(max-width:640px){.row,.row.pay{grid-template-columns:1fr 1fr}}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--b);font-size:14px}th{color:var(--m);font-weight:600}
+.tbl{overflow-x:auto}.bd{padding:2px 8px;border-radius:99px;font-size:12px;color:#fff}.ok{background:var(--g)}.pe{background:var(--r)}
+.bars{display:flex;gap:10px;align-items:flex-end;height:150px}.bars div{flex:1;text-align:center;font-size:12px;color:var(--m)}.bars i{display:block;background:var(--a);border-radius:6px 6px 0 0;margin-bottom:4px}
+#modal{display:none;position:fixed;inset:0;background:#000a;z-index:20;overflow:auto;padding:14px}#modal .in{background:#eee;max-width:840px;margin:auto;border-radius:12px;padding:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.sc{overflow-x:auto}
+pre{background:#111;color:#cfe;padding:12px;border-radius:8px;overflow:auto;font-size:12px;max-height:260px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:8px;display:none;z-index:30}
+.tag{display:inline-block;background:#eee;border-radius:99px;padding:4px 10px;margin:3px}
+/* invoice */
+.inv{width:794px;height:1122px;padding:44px 40px;background:#fff;color:#111;overflow:hidden;font-family:'Noto Sans Gujarati',sans-serif;font-size:14px}
+.inv .c{text-align:center}.inv .lg{font-size:60px;line-height:1;font-family:Inter,sans-serif;display:inline}.inv .sh{font-size:32px;font-family:Inter,sans-serif}
+.inv .bar2{background:#6b6b78;color:#fff;display:flex;justify-content:space-around;padding:8px;margin-top:6px;font-family:Inter,sans-serif;font-size:15px}
+.inv .ad{text-align:center;font-weight:700;font-size:13px;padding:8px 0;border-top:1px solid #111;border-bottom:1px solid #111}
+.inv .f{display:flex;gap:10px;margin-top:16px;font-weight:700}.inv .f span{flex:1;border-bottom:1px solid #111;padding-bottom:3px}
+.inv .er{display:grid;grid-template-columns:150px 1fr 16px 210px;align-items:center;min-height:48px;border-bottom:1px solid #111;padding:4px 0;font-weight:700}
+.inv .er .d{font-weight:400;color:#444}.inv .er .s{font-weight:400;white-space:pre-line;font-family:Inter,sans-serif;font-size:14px}
+.inv .il{display:flex;align-items:flex-end;gap:10px;margin-top:22px}.inv .ilb{width:130px;font-weight:700}.inv .ilv{flex:1;border-bottom:1px solid #111;font-weight:700;padding-bottom:3px;min-height:22px}.inv .ild{width:190px;border-bottom:1px solid #111;padding-bottom:3px}
+.inv .pill{display:inline-block;background:#111;color:#fff;font-weight:700;padding:5px 14px;border-radius:6px;font-size:12px;margin:24px 0 8px}.inv .nt{font-size:12.5px;line-height:1.95}
+.inv .th{text-align:center;font-family:Inter,sans-serif;font-weight:600;font-size:23px;margin-top:22px}
+</style></head><body>
+<header><b>📸 VS Film બિલબુક</b><div id="nav"></div><span id="mode" style="margin-left:auto;font-size:12px"></span></header>
+<main id="main"></main><div id="modal"></div><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),E=x=>x==null?'':String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),N=n=>(+n||0).toLocaleString('en-IN'),fd=d=>d?d.split('-').reverse().join('-'):'',today=()=>new Date().toISOString().slice(0,10);
+const defET=['વણા રસમ','ફુલેકું','મંડપ પીઠી ગરબા','વેડિંગ','રિસેપ્શન','એન્ગેજમેન્ટ','પ્રી-વેડિંગ'];
+const defS={logo:'VS',shop:'Film Surat',tag:'Making your lifetime memories',insta:'vs_film_surat',phone:'98246 23330',addr:'દુકાન નં. 440 લિયોનાર્ડ સ્કવેર, યોગી ચોક, સુરત - 395010',god:'|| શ્રી ગણેશાય નમ: ||',thanks:'Thank You For Your Order',svc:'traditional Photo\ntraditional Video',pct:10,pin:'',notes:['ઓર્ડર આપતી વખતે 10% એડવાન્સ રકમ આપવાની રહેશે.','કોઈપણ સંજોગોમાં ઓર્ડર કેન્સલ થશે તો એડવાન્સ રકમ પરત મળશે નહી.','લગ્ન પૂરા થયા બાદ 50% પેમેન્ટ જમા કરાવવાનું રહેશે.','બાકીનું 40% પેમેન્ટ ડેટા લેવા આવો ત્યારે આપવાનું રહેશે','રો ડેટા બે મહિનામાં લઈ જવાનું રહેશે પછી અમારી કોઈ જવાબદારી રહેશે નહી.','ચાલુ ઓર્ડર દરમ્યાન કોઈપણ ટેકનિક ખામીના કારણે કેમેરો બંધ થઈ જાય તો સહકાર આપવા વિનંતી. તકરાર કરવી નહીં']};
+let cfg=JSON.parse(localStorage.vsCfg||'{}'),sb=null,S={...defS},ET=[],B=[],tab='dash',cur=null,q='';
+const SQL=`create table if not exists bookings(id uuid primary key default gen_random_uuid(),name text not null,phone text,booking_date date,venue text,package_amount numeric default 0,events jsonb default '[]',payments jsonb default '[]',created_at timestamptz default now());
+create table if not exists event_types(id bigint generated always as identity primary key,name text not null unique);
+create table if not exists settings(id int primary key,data jsonb);
+alter table bookings enable row level security;alter table event_types enable row level security;alter table settings enable row level security;
+create policy "app" on bookings for all using(true) with check(true);
+create policy "app" on event_types for all using(true) with check(true);
+create policy "app" on settings for all using(true) with check(true);
+insert into event_types(name) values ${defET.map(x=>`('${x}')`).join(',')} on conflict do nothing;`;
+const paid=b=>(b.payments||[]).reduce((s,x)=>s+(+x.amount||0),0),bal=b=>(+b.package_amount||0)-paid(b);
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+async function load(){
+ if(sb){const[b,e,s]=await Promise.all([sb.from('bookings').select('*').order('created_at',{ascending:false}),sb.from('event_types').select('*').order('id'),sb.from('settings').select('*').eq('id',1).maybeSingle()]);
+  if(b.error)toast('Supabase: '+b.error.message);B=b.data||[];ET=e.data||[];S={...defS,...(s.data?.data||{})}}
+ else{B=JSON.parse(localStorage.vsB||'[]');ET=JSON.parse(localStorage.vsE||'null')||defET.map((n,i)=>({id:i+1,name:n}));S={...defS,...JSON.parse(localStorage.vsS||'{}')}}
+ $('#mode').textContent=sb?'🟢 Supabase કનેક્ટેડ':'🟡 લોકલ મોડ (આ બ્રાઉઝરમાં)'}
+const newB=()=>({name:'',phone:'',booking_date:today(),venue:'',package_amount:'',events:[{date:'',type:'',svc:S.svc}],payments:[{date:today(),amount:'',note:''}]});
+function go(t){if(t=='new'){cur=newB();t='form'}if(t=='form'&&!cur)cur=newB();tab=t;render();scrollTo(0,0)}
+function render(){const n=[['dash','📊 ડેશબોર્ડ'],['list','📋 બુકિંગ'],['new','➕ નવું બુકિંગ'],['set','⚙️ સેટિંગ્સ']];
+ $('#nav').innerHTML=n.map(([k,t])=>`<button class="${tab==k||(tab=='form'&&k=='new')?'on':''}" onclick="go('${k}')">${t}</button>`).join('');
+ $('#main').innerHTML={dash,list,form,set}[tab]();if(tab=='form')upd()}
+/* DASHBOARD */
+function dash(){const ym=today().slice(0,7),rev=B.reduce((s,b)=>s+(+b.package_amount||0),0),got=B.reduce((s,b)=>s+paid(b),0);
+ const mb=B.filter(b=>(b.booking_date||'').startsWith(ym)).length,mg=B.reduce((s,b)=>s+(b.payments||[]).filter(p=>(p.date||'').startsWith(ym)).reduce((a,p)=>a+ +p.amount,0),0);
+ const ms=[];for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);ms.push(d.toISOString().slice(0,7))}
+ const mv=ms.map(m=>B.reduce((s,b)=>s+(b.payments||[]).filter(p=>(p.date||'').startsWith(m)).reduce((a,p)=>a+ +p.amount,0),0)),mx=Math.max(...mv,1);
+ const up=B.flatMap(b=>(b.events||[]).map(e=>({...e,b}))).filter(e=>e.date>=today()).sort((a,c)=>a.date>c.date?1:-1).slice(0,8);
+ const due=B.filter(b=>bal(b)>0).sort((a,c)=>bal(c)-bal(a)).slice(0,8);
+ return `<h2>ડેશબોર્ડ</h2><div class="cards">${[['કુલ બુકિંગ',B.length],['કુલ પેકેજ','₹'+N(rev)],['મળેલ રકમ','₹'+N(got)],['બાકી રકમ','₹'+N(rev-got)],['આ મહિને બુકિંગ',mb],['આ મહિને મળેલ','₹'+N(mg)]].map(([a,b])=>`<div class="k"><small>${a}</small><div>${b}</div></div>`).join('')}</div>
+ <div class="card"><b>છેલ્લા 6 મહિનામાં મળેલ રકમ</b><div class="bars" style="margin-top:12px">${mv.map((v,i)=>`<div><small>₹${N(v)}</small><i style="height:${Math.max(4,v/mx*110)}px"></i>${ms[i].slice(5)}/${ms[i].slice(2,4)}</div>`).join('')}</div></div>
+ <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div class="card"><b>📅 આગામી ઇવેન્ટ</b>${up.map(e=>`<p>${fd(e.date)} — <b>${E(e.type)}</b><br><small>${E(e.b.name)} · ${E(e.b.venue)}</small></p>`).join('')||'<p>કોઈ નથી</p>'}</div>
+ <div class="card"><b>💰 બાકી રકમ (ટોપ)</b>${due.map(b=>`<p>${E(b.name)} — <b style="color:var(--r)">₹${N(bal(b))}</b> <button onclick="showInv('${b.id}')">બિલ</button></p>`).join('')||'<p>બધું ચૂકતે ✓</p>'}</div></div>`}
+/* LIST */
+function list(){const f=B.filter(b=>(b.name+b.phone+b.venue).toLowerCase().includes(q.toLowerCase()));
+ return `<h2>બુકિંગ (${B.length})</h2><div class="card"><input placeholder="🔍 નામ / મોબાઈલ / સ્થળ શોધો" value="${E(q)}" oninput="q=this.value;$('#tb').innerHTML=rows()"></div><div class="card tbl"><table><thead><tr><th>નામ</th><th>સ્થળ</th><th>પ્રથમ ઇવેન્ટ</th><th>પેકેજ</th><th>મળેલ</th><th>બાકી</th><th></th></tr></thead><tbody id="tb">${rows()}</tbody></table></div>`}
+function rows(){return B.filter(b=>(b.name+b.phone+b.venue).toLowerCase().includes(q.toLowerCase())).map(b=>`<tr><td><b>${E(b.name)}</b><br><small>${E(b.phone)}</small></td><td>${E(b.venue)}</td><td>${fd((b.events||[])[0]?.date)}</td><td>₹${N(b.package_amount)}</td><td>₹${N(paid(b))}</td><td><span class="bd ${bal(b)>0?'pe':'ok'}">${bal(b)>0?'₹'+N(bal(b)):'ચૂકતે'}</span></td><td style="white-space:nowrap"><button onclick="showInv('${b.id}')">🧾</button> <button onclick="edit('${b.id}')">✏️</button> <button class="x" onclick="del('${b.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan=7>કોઈ બુકિંગ નથી</td></tr>'}
+/* FORM */
+function form(){const b=cur;return `<h2>${b.id?'બુકિંગ સુધારો':'નવું બુકિંગ'}</h2><div class="card grid">
+<label>નામ *<input value="${E(b.name)}" oninput="cur.name=this.value"></label><label>મોબાઈલ (WhatsApp)<input type="tel" value="${E(b.phone)}" oninput="cur.phone=this.value"></label>
+<label>બુકિંગ તા.<input type="date" value="${b.booking_date||''}" oninput="cur.booking_date=this.value"></label><label>લગ્નનું સ્થળ<input value="${E(b.venue)}" oninput="cur.venue=this.value"></label></div>
+<datalist id="dl">${ET.map(e=>`<option value="${E(e.name)}">`).join('')}</datalist>
+<div class="card"><h3 style="margin-top:0">ઇવેન્ટ (તારીખ મુજબ)</h3>${b.events.map((e,i)=>`<div class="row"><input type="date" value="${e.date||''}" oninput="cur.events[${i}].date=this.value"><input list="dl" placeholder="ઇવેન્ટ પસંદ કરો / લખો" value="${E(e.type)}" oninput="cur.events[${i}].type=this.value"><textarea rows="2" placeholder="સેવાઓ" oninput="cur.events[${i}].svc=this.value">${E(e.svc)}</textarea><button class="x" onclick="cur.events.splice(${i},1);render()">✕</button></div>`).join('')}<button onclick="cur.events.push({date:'',type:'',svc:S.svc});render()">＋ ઇવેન્ટ ઉમેરો</button></div>
+<div class="card"><h3 style="margin-top:0">પેકેજ અને પેમેન્ટ</h3><label style="max-width:260px">મેરેજ પેકેજ (₹)<input type="number" value="${b.package_amount}" oninput="cur.package_amount=this.value;upd()"></label><h3>પેમેન્ટ (પહેલું = એડવાન્સ)</h3>
+${b.payments.map((p,i)=>`<div class="row pay"><input type="date" value="${p.date||''}" oninput="cur.payments[${i}].date=this.value"><input type="number" placeholder="${i?'રકમ':'એડવાન્સ રકમ'}" value="${p.amount}" oninput="cur.payments[${i}].amount=this.value;upd()"><input placeholder="નોંધ (વૈકલ્પિક)" value="${E(p.note)}" oninput="cur.payments[${i}].note=this.value"><button class="x" onclick="cur.payments.splice(${i},1);render()">✕</button></div>`).join('')}
+<button onclick="cur.payments.push({date:today(),amount:'',note:''});render()">＋ પેમેન્ટ ઉમેરો</button> <button onclick="cur.payments[0]=cur.payments[0]||{date:today(),note:''};cur.payments[0].amount=Math.round((+cur.package_amount||0)*S.pct/100);render()">${S.pct}% એડવાન્સ ભરો</button>
+<p style="font-size:18px">મળેલ: <b id="pd"></b> · બાકી: <b id="bl" style="color:var(--r)"></b></p></div>
+<button class="p" onclick="save()">💾 સેવ કરો</button> <button onclick="cur=null;go('list')">રદ</button>`}
+function upd(){$('#pd').textContent='₹'+N(paid(cur));$('#bl').textContent='₹'+N(bal(cur))}
+function edit(id){cur=JSON.parse(JSON.stringify(B.find(x=>x.id==id)));if(!cur.events.length)cur.events=[{date:'',type:'',svc:S.svc}];go('form')}
+async function save(){const b=cur;if(!b.name.trim())return toast('નામ લખો');
+ const p={name:b.name,phone:b.phone,booking_date:b.booking_date||null,venue:b.venue,package_amount:+b.package_amount||0,events:b.events.filter(e=>e.date||e.type).sort((a,c)=>a.date>c.date?1:-1),payments:b.payments.filter(x=>+x.amount).map(x=>({...x,amount:+x.amount}))};
+ if(sb){const r=b.id?await sb.from('bookings').update(p).eq('id',b.id):await sb.from('bookings').insert(p);if(r.error)return toast(r.error.message)}
+ else{if(b.id)B=B.map(x=>x.id==b.id?{...x,...p}:x);else B.unshift({...p,id:Date.now(),created_at:new Date().toISOString()});localStorage.vsB=JSON.stringify(B)}
+ cur=null;await load();tab='list';render();toast('સેવ થયું ✓')}
+async function del(id){if(!confirm('આ બુકિંગ કાયમ માટે ડિલીટ કરવું?'))return;
+ if(sb){const r=await sb.from('bookings').delete().eq('id',id);if(r.error)return toast(r.error.message)}else{B=B.filter(x=>x.id!=id);localStorage.vsB=JSON.stringify(B)}
+ await load();render()}
+/* INVOICE */
+function inv(b){const pd=b.payments||[],a=pd[0],rest=pd.slice(1),ev=b.events||[],ln=(l,v,d)=>`<div class="il"><span class="ilb">${l}</span><span>:</span><span class="ilv">${v}</span>${d!==undefined?`<span class="ild">તા.- <b>${fd(d)}</b></span>`:''}</div>`;
+ let er=ev.map(e=>`<div class="er"><span class="d">તા.- <b>${fd(e.date)}</b></span><span>${E(e.type)}</span><span>:</span><span class="s">${E(e.svc)}</span></div>`);while(er.length<5)er.push('<div class="er"><span></span><span></span><span>:</span><span></span></div>');
+ return `<div class="inv"><div class="c" style="font-size:11px">${E(S.god)}</div><div class="c" style="margin-top:8px"><span class="lg">${E(S.logo)}</span> <span class="sh">${E(S.shop)}</span><div style="font-size:11px;font-family:Inter">${E(S.tag)}</div></div>
+<div class="bar2"><span>📷 ${E(S.insta)}</span><span>📞 ${E(S.phone)}</span></div><div class="ad">${E(S.addr)}</div>
+<div class="f"><span>નામ : ${E(b.name)}</span><span style="flex:.5">બુકિંગ તા. ${fd(b.booking_date)}</span></div><div class="f"><span>લગ્નનું સ્થળ : ${E(b.venue)}</span></div>
+<div style="margin-top:22px;border-top:1px solid #111">${er.slice(0,Math.max(5,ev.length)).join('')}</div>
+<div style="margin-top:26px">${ln('મેરેજ પેકેજ','₹ '+N(b.package_amount))}${ln('એડવાન્સ',a?'₹ '+N(a.amount):'',a?a.date:'')}${rest.map(p=>ln('પેમેન્ટ','₹ '+N(p.amount),p.date)).join('')}${ln('બાકી રકમ','₹ '+N(bal(b)))}</div>
+<div class="pill">ખાસ નોંધ :</div><div class="nt">${(S.notes||[]).map((n,i)=>`${i+1}) ${E(n)}`).join('<br>')}</div><div class="th">${E(S.thanks)}</div></div>`}
+function showInv(id){const b=B.find(x=>x.id==id);$('#modal').style.display='block';$('#modal').innerHTML=`<div class="in"><div class="bar"><button class="p" onclick="dl('${id}')">⬇ PDF ડાઉનલોડ</button><button class="wa" onclick="wa('${id}')">WhatsApp પર મોકલો</button><button onclick="edit('${id}');$('#modal').style.display='none'">✏️ સુધારો</button><button onclick="$('#modal').style.display='none'">✕ બંધ</button></div><div class="sc">${inv(b)}</div></div>`}
+async function pdf(b){const h=document.createElement('div');h.style.cssText='position:fixed;left:-9999px;top:0';h.innerHTML=inv(b);document.body.appendChild(h);await document.fonts.ready;
+ const bl=await html2pdf().set({margin:0,html2canvas:{scale:2},jsPDF:{unit:'px',format:[794,1122],hotfixes:['px_scaling']}}).from(h.firstChild).outputPdf('blob');h.remove();return bl}
+const fn=b=>'Invoice-'+b.name.replace(/\s+/g,'_')+'.pdf';
+function save2(bl,n){const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=n;a.click()}
+async function dl(id){const b=B.find(x=>x.id==id);toast('PDF બની રહ્યું છે…');save2(await pdf(b),fn(b))}
+async function wa(id){const b=B.find(x=>x.id==id);toast('PDF બની રહ્યું છે…');const bl=await pdf(b),f=new File([bl],fn(b),{type:'application/pdf'}),
+ m=`નમસ્તે ${b.name},\n${S.logo} ${S.shop} તરફથી તમારું બિલ.\nપેકેજ: ₹${N(b.package_amount)}\nમળેલ: ₹${N(paid(b))}\nબાકી: ₹${N(bal(b))}\nઆભાર 🙏`;
+ if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:m})}catch(e){}}
+ else{save2(bl,fn(b));let p=(b.phone||'').replace(/\D/g,'');if(p.length==10)p='91'+p;window.open(`https://wa.me/${p}?text=${encodeURIComponent(m)}`,'_blank');toast('PDF ડાઉનલોડ થયું – WhatsApp ચેટમાં attach કરો')}}
+/* SETTINGS */
+function set(){const f=(k,l)=>`<label>${l}<input value="${E(S[k])}" oninput="S.${k}=this.value"></label>`;
+ return `<h2>સેટિંગ્સ</h2><div class="card"><h3 style="margin-top:0">🔌 Supabase (ફ્રી ડેટાબેઝ)</h3><p style="font-size:13px;color:var(--m)">1) supabase.com પર ફ્રી પ્રોજેક્ટ બનાવો → 2) SQL Editor માં નીચેનો SQL ચલાવો → 3) Project Settings → API માંથી URL અને anon key અહીં નાખો.</p>
+<div class="grid"><label>Project URL<input id="su" placeholder="https://xxxx.supabase.co" value="${E(cfg.url)}"></label><label>anon public key<input id="sk" value="${E(cfg.key)}"></label></div><p><button class="p" onclick="conn()">કનેક્ટ કરો</button> <button onclick="disc()">લોકલ મોડ</button> <button onclick="navigator.clipboard.writeText(SQL);toast('SQL કોપી થયું')">SQL કોપી</button></p><pre>${E(SQL)}</pre></div>
+<div class="card"><h3 style="margin-top:0">🏢 બિઝનેસ માહિતી</h3><div class="grid">${f('god','ટોપ લાઇન')}${f('logo','લોગો (VS)')}${f('shop','નામ')}${f('tag','ટેગલાઇન')}${f('insta','Instagram')}${f('phone','ફોન')}${f('addr','સરનામું')}${f('thanks','નીચેનો સંદેશ')}<label>ડિફોલ્ટ સેવાઓ<textarea rows="2" oninput="S.svc=this.value">${E(S.svc)}</textarea></label><label>એડવાન્સ %<input type="number" value="${S.pct}" oninput="S.pct=+this.value"></label><label>એપ PIN (ખાલી = લોક નહીં)<input value="${E(S.pin)}" oninput="S.pin=this.value"></label></div>
+<h3>ખાસ નોંધ (દરેક લાઇન = એક મુદ્દો)</h3><textarea rows="7" oninput="S.notes=this.value.split('\\n').filter(x=>x.trim())">${E((S.notes||[]).join('\n'))}</textarea><p><button class="p" onclick="saveS()">💾 સેટિંગ્સ સેવ</button></p></div>
+<div class="card"><h3 style="margin-top:0">🎉 ઇવેન્ટ પ્રકાર</h3>${ET.map(e=>`<span class="tag">${E(e.name)} <a href="#" class="x" onclick="delET('${e.id}');return false">✕</a></span>`).join('')}<p style="display:flex;gap:8px"><input id="etn" placeholder="નવો ઇવેન્ટ પ્રકાર (દા.ત. સીમંત)"><button class="p" onclick="addET()">ઉમેરો</button></p></div>`}
+async function saveS(){if(sb){const r=await sb.from('settings').upsert({id:1,data:S});if(r.error)return toast(r.error.message)}else localStorage.vsS=JSON.stringify(S);toast('સેવ થયું ✓')}
+async function addET(){const n=$('#etn').value.trim();if(!n)return;if(sb){const r=await sb.from('event_types').insert({name:n});if(r.error)return toast(r.error.message)}else{ET.push({id:Date.now(),name:n});localStorage.vsE=JSON.stringify(ET)}await load();render()}
+async function delET(id){if(sb)await sb.from('event_types').delete().eq('id',id);else{ET=ET.filter(x=>x.id!=id);localStorage.vsE=JSON.stringify(ET)}await load();render()}
+function conn(){cfg={url:$('#su').value.trim(),key:$('#sk').value.trim()};localStorage.vsCfg=JSON.stringify(cfg);location.reload()}
+function disc(){localStorage.removeItem('vsCfg');location.reload()}
+(async()=>{if(cfg.url&&cfg.key)try{sb=supabase.createClient(cfg.url,cfg.key)}catch(e){}
+ await load();if(S.pin){let p;do{p=prompt('PIN દાખલ કરો')}while(p!==null&&p!==S.pin);if(p===null){document.body.innerHTML='🔒';return}}render()})();
+</script></body></html>
